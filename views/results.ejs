@@ -1,0 +1,65 @@
+<script>
+
+for(i=0; i < serverStatus.NUMQ; i++){
+	$('#tblRightAnswers').append(
+			'<tr result="' + i +'_result.html" class="question_detail"><td>' + (i + 1) //question
+			+ '</td><td>' + serverStatus.RANSWER[i]  //Answer
+			+ '</td><td>' + serverStatus.AVG_RATINGS[i] //Avg Rating
+			+ '</td><td>' + serverStatus.RPERCENT[i] + '%' // Percengate of correct answers
+		//	+ '</td><td style="display: none;">' + data
+			+ '</td></tr>'
+	); 
+
+}
+
+$('#winRating').html(serverStatus.WINRATING.join(', '));
+$('#winScore').html(serverStatus.WINSCORE.join(', '));
+$('#hightScore').html(serverStatus.HIGHSCORE);
+$('#highRating').html(serverStatus.HIGHRATING);
+$('#numQuestions').html(serverStatus.NUMQ);
+
+//Tentar fazer com o $.each
+
+$('.question_detail').each(
+	function(key, val){
+		console.log(key);
+		requestUri = serverQuestionsUri + key +'_result.html';	
+		var ctnt = $.get(requestUri).complete(function(){
+
+			$(val).popover({
+
+			  placement: 'right'
+			, trigger: 'hover'
+			, content: ctnt.responseText				
+			, title: 'Question ' + (key + 1)
+
+		})
+
+		});
+		
+
+	});
+
+</script>
+
+<div id="resultScreen" class="">
+
+<table class="info-table">
+	<th>Question</th><th>Answer</th><th>Average Rating</th><th>Correct Answers</th>
+	<tbody id="tblRightAnswers">
+
+	</tbody>
+</table>
+<hr>
+<table class="info-table">
+	<tbody id="tblInfo">
+	<tr><td><b>Number of Questions: </b></td> <td><span id="numQuestions"></span> questions.</td></tr>
+	<tr><td><b>Winner Score: </b></td> <td><span  id="winScore"></span>.</td></tr>
+	<tr><td><b>Winner Rating: </b></td> <td><span id="winRating"></span>.</td></tr>
+	<tr><td><b>High Score: </b></td> <td><span  id="hightScore"></span> questions correct.</td></tr>
+	<tr><td><b>High Rating: </b></td> <td>Question <span  id="highRating"></span>.</td></tr>
+	</tr>
+	</tbody>
+</table>
+
+</div>

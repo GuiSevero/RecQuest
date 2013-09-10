@@ -41,7 +41,24 @@
     <div class="row-fluid">
           <div class="span12">
         <!-- wraper for content flow -->  
-        <div id="main-menu"></div>
+        <div id="main-menu">
+          
+              <fieldset>
+                <legend>RecQuest</legend>
+                <div class="control-group" id="input-login">
+                  <label class="control-label" for="txtLogin">Login</label>
+                  <div class="controls">
+                    <input type="text" id="txtLogin">
+                    <span class="help-inline" id="errorMsg"></span>
+                  </div>
+                </div>
+                
+                <a class="btn" id="btnLogin">Submit</a>
+                <div id="error" style="margin: 10px;"></div>
+              </fieldset>
+
+
+        </div>
       </div><!-- /span -->    
       </div><!-- /row -->
 
@@ -57,18 +74,44 @@
   <script type="text/javascript" src="js/jquery.js"></script>
   <script type="text/javascript" src="js/less.js"></script>
   <script type="text/javascript" src="js/socket.io.min.js"></script>
+  <script type="text/javascript" src="js/RecQuest.js"></script>
   <script type="text/javascript" language="Javascript">
-        
-        google.load('search', '1');
+  (function(){
 
+
+        google.load('search', '1');
          var server = 'http://<%= server %>:<%= port %>';
+         console.log(server);
             var socket = io && io.connect(server);
 
-            //Evento de final de jogo
-            socket.on('changestatus', function(status){
-                $('#userStatus').html(status);
-                console.log(status);
-              }) 
+          var recQuest = new RecQuest(socket, '#userStatus');
+
+          window.recquest = recQuest;
+
+          $('#btnLogin').click(function(){
+            var username = $('#txtLogin').val();
+            if(username == '') { 
+              displayError("Can't be empty");
+            }else{
+                recQuest.login(username);
+                   
+                }
+
+          });
+
+
+          function displayError(error){
+              $('#input-login').addClass('error');
+              $('#errorMsg').html(error);
+        
+
+              setTimeout(function(){
+                $('#input-login').removeClass('error');
+                $('#errorMsg').html('');
+              },3000);
+
+          }
+})();
      </script>
   </body>
 </html>
