@@ -61,6 +61,12 @@
 		</div>
 </form>
 <script>
+(function(){
+
+	for(var i=0, n=tinymce.editors.length; i<n; i++) {
+	    tinymce.editors[i].destroy();
+	    delete document.getElementById(tinymce.editors[i].id);
+	}
 	
 	var canSent = false;
 
@@ -75,7 +81,7 @@
         	};
 
 	//Load the tinyMCE text editor
-	var ed = tinyMCE.init({
+	tinyMCE.init({
         mode : "exact",
         elements : "qtnBody",
          width : "100%",
@@ -84,13 +90,12 @@
         		// Display an alert onclick
        			ed.onKeyUp.add(keyFunction);
     	 }
-	});
+	}); 
 
 	function googleSearch(){	
 			var ed = tinyMCE.get('qtnBody');
 			$.post('/sobek', {texto: $(ed.getContent()).text()}, sobekCallBack );
 			ed.onKeyUp.add(keyFunction);
-			
 
 		}
 
@@ -132,8 +137,8 @@
      		&& ($('#qtnAnsText4').val() != '')){
      		canSent = true;
      	}
-		
-
+     	console.log("Content");
+     	console.log(tinyMCE.get('qtnBody').getContent());
 
      	if(!canSent){
      		alert('Preencha todos os campos')
@@ -169,5 +174,6 @@
 		});
 		
 	}
+})()
 
 </script>

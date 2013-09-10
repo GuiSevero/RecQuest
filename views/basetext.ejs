@@ -1,0 +1,87 @@
+
+
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Junction Quiz</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Le styles -->
+ <link href="css/bootstrap.css" rel="stylesheet">
+ <link href="css/bootstrap-responsive.css" rel="stylesheet">
+ <link href="css/main.less" rel="stylesheet/less">
+
+</head>
+
+
+<body id="main_body" >  
+  <input type="hidden" id="myIp" value="<?php echo $_SERVER['REMOTE_ADDR']; ?>"/><br>
+  <input type="hidden" id="serverIp" size="30" value="<?php echo $_SERVER['SERVER_NAME']; ?>"/><br>
+  <div class="container-fluid default-container">
+    <div class="row-fluid">
+
+      <div class="span4">
+        <span class="label label-info" id="status"></span>        
+      </div><!-- /span -->
+
+          <div class="span4">
+        <h1 align="center">Junction Quiz</h1> 
+        <div id="server_msg"></div>  
+      </div><!-- /span -->
+
+      <div class="span4">
+        <ul class="nav pull-right">
+                  <li id="op-menu" class="btn">
+                     <b><span id="userStatus"></span></b> - <i class="icon-user"></i>
+                   </li>
+
+                </ul>
+                <div class="clearfix"></div>
+      </div><!-- /span -->
+    </div><!-- /row -->
+
+    <div class="row-fluid">
+          <div class="span12" id="content-handler">
+          
+        <!-- wraper for content flow -->  
+       <form class="form" action="/basetext" method="POST">
+
+			<textarea rows="40" cols="50" class="input-block-level" name="base_text">
+				<%= text %>
+			</textarea><br>
+			<input type="submit" class="btn btn-primary btn-large" value="Save">
+
+		</form>
+
+      </div><!-- /span -->    
+      </div><!-- /row -->
+
+  </div> <!-- /container -->
+
+
+  <!-- Scripts -->
+  <script type="text/javascript" src="js/jquery.js"></script>
+  <script type="text/javascript" src="js/less.js"></script>
+  <% if(writeSuccess) {%>
+  <script>
+
+  	setTimeout(function(){
+  		$('#server_msg').html('');
+  	}, 3000);
+
+  	$('#server_msg').html(
+  		[
+  			"<span class='alert alert-success'>"
+  		,	"Arquivo salvo com sucesso!"
+  		,	"</span>"
+
+  		].join('')
+
+  	);
+	
+  </script> 
+  <% } %>
+  </body>
+</html>

@@ -14,6 +14,7 @@
         server_msg: 'JunctionServerExecution/current/MSG/smsg.txt'
       , server_msg_uri: '/JunctionServerExecution/current/MSG/smsg.txt'
       , server_path: 'JunctionServerExecution/current/MSG/'
+      , server_base_text: 'basetext.txt'
       , isOnline: false
       , socket: {}
     }
@@ -96,6 +97,25 @@
     res.render('results',  { server: req.headers.host , port: app.get('port') });
   });
 
+    app.get('/basetext', function(req, res){
+      fs.readFile(server.server_base_text, 'utf-8', function(err, data){
+        if(err) { res.send(404); return; }
+        res.render('basetext',  { server: req.headers.host , port: app.get('port'), text: data, writeSuccess: false });
+      });
+    
+  });
+
+    app.post('/basetext', function(req, res){
+      var text = req.body.base_text;
+      fs.writeFile(server.server_base_text,text, function(err){
+          if(err) { res.send(500); return; }
+          res.render('basetext',{text: text, writeSuccess: true});
+      });
+      
+    
+  });
+
+
 
     app.post('/sobek', function(req, res){
     //res.render('results',  { server: req.headers.host , port: app.get('port') });
@@ -167,6 +187,7 @@
 
     //VERIFICA SE O USUARIO JA ESTAVA LOGADO
     if(user){
+      console.log("Restoring via user hash table");
       //Atualiza socket do usuario
       user.socket = socket;
       socket.user = user;
@@ -185,7 +206,38 @@
         socket.emit('displayError', "SERVER OFFLINE");
 
     }else{
-      console.log('NEW USER AT ' + userIp);
+      console.log("Restoring via ip text msg");
+      fs.readFile(server.server_path + userIp + '.txt','utf-8', function (err, data) {
+
+        if(err) { console.log('NEW USER AT ' + userIp); return; }
+
+        var usrMsg = JSON.parse(data);
+        if(server.isOnline){
+
+            socket.user = {
+            name: usrMsg.NAME
+          , socket: socket
+          , ip: userIp
+          , teacherMsg: teacherMsg
+
+          };
+
+        users[userIp] = socket.user;
+
+        socket.emit("restore_state",
+          { 
+                  name: usrMsg.NAME
+                , ip: userIp
+                , teacherMsg: teacherMsg 
+                , loged: true
+          });
+        }
+      else
+        socket.emit('displayError', "SERVER OFFLINE");
+
+
+      });
+      
     }
 
 
@@ -203,13 +255,17 @@
        
     });
 
-    socket.on('login', function(data, fnAck){
+socket.on('login', function(data, fnAck){
 
-      if(!server.isOnline){
+    fs.readFile(server.server_msg,'utf-8', function (err, teacherData) {
+
+      if (err){ 
         socket.emit('displayError', "SERVER OFFLINE");
-      return;
+        return;
       }
-      
+
+      teacherMsg = JSON.parse(teacherData);
+
       //Registra o usuario para o JunctionServer
       var fname = 'MSG'+crypto.randomBytes(4).readUInt32LE(0)+'';
       data.MSG.IP = userIp;
@@ -241,13 +297,25 @@
         
         fnAck(data.MSG);
 
-      });
 
+      });  
+       
     });
 
+});
+
     socket.on('get_server_state', function(){
-      console.log("RESTORING " + teacherMsg.TYPE)
-      socket.emit(teacherMsg.TYPE);
+      fs.readFile(server.server_msg,'utf-8', function (err, teacherData) {
+
+        if(err){
+          socket.emit('displayError', "SERVER OFFLINE");
+          return;
+        }
+         var teacherMsg = JSON.parse(teacherData);
+        console.log("RESTORING " + teacherMsg.TYPE)
+        socket.emit(teacherMsg.TYPE);
+
+      });
     });
 
     socket.on('question', function(data){});

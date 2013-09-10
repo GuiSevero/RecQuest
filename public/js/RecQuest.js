@@ -86,10 +86,11 @@ function RecQuest(socket, container){
 
         socket.on('restore_state', function(data){
         	for(i in data){ user[i] = data[i];}
-        	console.log("Estado restaurado");
+        	console.log("Estado restaurado ");
+        	console.log(data);
         	  //Get the current state
-        	registerSocketsEvents(data.teacherMsg);
-      		socket.emit('get_server_state');
+        	registerSocketsEvents();
+      		
 
         })
 
