@@ -88,7 +88,13 @@
   });
 
   app.get('/wait', function(req, res){
-    res.render('wait',  { server: req.headers.host , port: app.get('port'), ip: req.connection.remoteAddress });
+
+    fs.readFile(server.server_base_text, 'utf-8', function(err, data){
+      if(err) res.send(500);
+      else{
+        res.render('wait',  { server: req.headers.host , port: app.get('port'), ip: req.connection.remoteAddress, basetext: data });    
+      }
+    }); 
   });
 
   app.get('/make', function(req, res){
