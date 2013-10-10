@@ -32,14 +32,19 @@
 </div>
 
 <script>
+
+
 		var currentQuestion = 0;
 		var solveAnswers;
 		var solveRatings;
-
-
+		var question_uri = <% question_uri %>;
+		var server = <% sv %>;
+		
+		console.log(question_uri);
+		
 
 		//load first question
-		$("#solveQuestionBody").load(serverIp + serverQuestionsUri + '/' + currentQuestion + '.html');
+		$("#solveQuestionBody").load( '/' + 'JunctionServerExecution/current/' + currentQuestion + '.html');
 
 		for(i=0; i < serverStatus.NUMQ; i++){
 			solveAnswers[i] = 1;
@@ -147,8 +152,5 @@
 		function setRating(){
 			solveRatings[currentQuestion] = $("#solveRating").val();
 		}
-
-
-
 
 </script>

@@ -15,6 +15,7 @@
       , server_msg_uri: '/JunctionServerExecution/current/MSG/smsg.txt'
       , server_path: 'JunctionServerExecution/current/MSG/'
       , server_base_text: 'basetext.txt'
+      , question_uri: "/JunctionServerExecution/current/"
       , isOnline: false
       , socket: {}
     }
@@ -75,39 +76,48 @@
 
   });
 
+  app.get("/JunctionServerExecution/current/", function (req, res){
+
+    res.send(" OK ");
+  });
+
 
   //INDEX
   app.get('/', function(req, res){
-    res.render('index',  { server: req.headers.host , port: app.get('port') });
+    res.render('index',  { server: req.headers.host , port: app.get('port'), ip: req.connection.remoteAddress });
   });
 
   app.get('/wait', function(req, res){
-    res.render('wait',  { server: req.headers.host , port: app.get('port') });
+    res.render('wait',  { server: req.headers.host , port: app.get('port'), ip: req.connection.remoteAddress });
   });
 
   app.get('/make', function(req, res){
-    res.render('make',  { server: req.headers.host , port: app.get('port') });
+    res.render('make',  { server: req.headers.host , port: app.get('port'), ip: req.connection.remoteAddress });
   });
 
    app.get('/solve', function(req, res){
-    res.render('solve',  { server: req.headers.host , port: app.get('port') });
+    server.ip = req.headers.host;
+      res.render('solve',  {
+         question_uri: server.ip + server.question_uri
+         ,sv: server
+      });
   });
 
     app.get('/results', function(req, res){
-    res.render('results',  { server: req.headers.host , port: app.get('port') });
+    res.render('results',  { server: req.headers.host , port: app.get('port'), ip: req.connection.remoteAddress });
   });
 
     app.get('/basetext', function(req, res){
       fs.readFile(server.server_base_text, 'utf-8', function(err, data){
-        if(err) { res.send(404); return; }
-        res.render('basetext',  { server: req.headers.host , port: app.get('port'), text: data, writeSuccess: false });
+        if(err) { res.send(500, err); return; }
+        res.render('basetext',  { server: req.headers.host , port: app.get('port'), ip: req.connection.remoteAddress, text: data, writeSuccess: false });
       });
     
   });
 
     app.post('/basetext', function(req, res){
       var text = req.body.base_text;
-      fs.writeFile(server.server_base_text,text, function(err){
+      fs.writeFile(server.server_base_text, text, 'utf-8', function(err){
           if(err) { res.send(500); return; }
           res.render('basetext',{text: text, writeSuccess: true});
       });
@@ -118,7 +128,7 @@
 
 
     app.post('/sobek', function(req, res){
-    //res.render('results',  { server: req.headers.host , port: app.get('port') });
+    //res.render('results',  { server: req.headers.host , port: app.get('port'), ip: req.connection.remoteAddress });
 
     var exec = require('child_process').exec;
     function puts(error, stdout, stderr) { 
@@ -126,6 +136,24 @@
      }
     exec("java -jar sobek.jar basetext.txt", puts);
   });
+
+
+
+    app.get("/JunctionServerExecution/current/:q", function(req, res, next){
+
+      fs.readFile("JunctionServerExecution/current/" + req.params.q, 'utf-8', function(err, data){
+
+        if(err){
+          res.send(404);
+          return;
+        }else{
+          res.send(data);  
+        }
+        
+      });
+
+    console.log(req.params);    
+});
 
 
 
@@ -183,7 +211,7 @@
     var userIp = socket.handshake.address.address;
     var user = users[userIp];
 
-    if(user) console.log(user.name  + server.isOnline);
+    if (user) console.log(user.name  + server.isOnline);
 
     //VERIFICA SE O USUARIO JA ESTAVA LOGADO
     if(user){

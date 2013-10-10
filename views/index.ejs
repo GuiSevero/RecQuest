@@ -81,9 +81,11 @@
 
         google.load('search', '1');
          var server = 'http://<%= server %>:<%= port %>';
+         var userip = '<%= ip %>';
          console.log(server);
-            var socket = io && io.connect(server);
 
+         var socket = io && io.connect(server);
+        
           var recQuest = new RecQuest(socket, '#userStatus');
 
           window.recquest = recQuest;
@@ -93,7 +95,7 @@
             if(username == '') { 
               displayError("Can't be empty");
             }else{
-                recQuest.login(username);
+                recQuest.login(username, userip);
                    
                 }
 
@@ -110,7 +112,7 @@
                 $('#errorMsg').html('');
               },3000);
 
-          }
+          }          
 })();
      </script>
   </body>

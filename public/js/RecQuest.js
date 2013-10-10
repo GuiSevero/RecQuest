@@ -34,14 +34,15 @@ function RecQuest(socket, container){
 		};
 
 
-		this.login = function(username){
+		this.login = function(username, ip){
 			
 			user.name = username;
+			user.ip = ip;
 			user.isLoged = true;
 			socket.emit('login', {MSG:user.getMsg()}, registerSocketsEvents);
 			
 		};
-
+ 
 		this.getUser = function(){return user;};
 
 
@@ -51,7 +52,7 @@ function RecQuest(socket, container){
 		* ===============
 		**/ 
       
-	 function registerSocketsEvents(){	
+	 function registerSocketsEvents(){		 		
 
 	        //IDEIA - SOH REGISTRAR LISTENERS DEPOIS DE FAZER O LOGIN
 	        socket.on('WAIT_CONNECT', function(data){
@@ -72,35 +73,34 @@ function RecQuest(socket, container){
 	        socket.on('START_SHOW', function(data){
 	            $(options.container).html('START_SHOW');
 	            $('#main-menu').load('/results');
-	          });
-
-	       //Get the current state
-	       socket.emit('get_server_state');
+	          });	       
+	       
     }
 
-    	//Register events
+    	 //Register events
         socket.on('server_changed', function(status){
             $(options.container).html(status);
             console.log(status);
           });
 
         socket.on('restore_state', function(data){
-        	for(i in data){ user[i] = data[i];}
-        	console.log("Estado restaurado ");
-        	console.log(data);
-        	  //Get the current state
-        	registerSocketsEvents();
-      		
+          for(i in data){ user[i] = data[i];}
+          console.log("Estado restaurado ");
+          console.log(data);
+            //Get the current state
+          registerSocketsEvents();
+          //Get the current state
+         socket.emit('get_server_state');
 
         })
 
         socket.on('displayError', function(data){
 
-        	 var err = document.createElement('div');
+           var err = document.createElement('div');
 
-        	 $(err).addClass('alert alert-error')
-        	 .html("<strong>ERROR! " + data);
-        	 $('#main-menu').append(err);
+           $(err).addClass('alert alert-error')
+           .html("<strong>ERROR! " + data);
+           $('#main-menu').append(err);
 
               setTimeout(function(){
                 $(err).remove();
@@ -110,6 +110,7 @@ function RecQuest(socket, container){
 
         //Funcao auxiliar para debug
         socket.on('log', function(log){console.log("DEBUG"); console.log(log)});
+    	
 
 
 		

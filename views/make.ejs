@@ -62,7 +62,7 @@
 </form>
 <script>
 (function(){
-
+	console.log("EDITORS: " + tinymce.editors.length);
 	for(var i=0, n=tinymce.editors.length; i<n; i++) {
 	    tinymce.editors[i].destroy();
 	    delete document.getElementById(tinymce.editors[i].id);
