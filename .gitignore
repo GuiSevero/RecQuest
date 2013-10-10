@@ -16,4 +16,5 @@ node_modules
 
 
 #USER DEFINE
-JuncionServerExecution/
+JuncionServerExecution/current
+*.html
