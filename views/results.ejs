@@ -1,29 +1,29 @@
 <script>
 
-for(i=0; i < serverStatus.NUMQ; i++){
+<% for(i=0; i < serverStatus.NUMQ; i++){ %>
 	$('#tblRightAnswers').append(
-			'<tr result="' + i +'_result.html" class="question_detail"><td>' + (i + 1) //question
-			+ '</td><td>' + serverStatus.RANSWER[i]  //Answer
-			+ '</td><td>' + serverStatus.AVG_RATINGS[i] //Avg Rating
-			+ '</td><td>' + serverStatus.RPERCENT[i] + '%' // Percengate of correct answers
+			'<tr result="<%=i%>_result.html" class="question_detail"><td> <%= (i+1) %>' //question
+			+ '</td><td> <%= serverStatus.RANSWER[i]%>'  //Answer
+			+ '</td><td> <%=serverStatus.AVG_RATINGS[i]%>' //Avg Rating
+			+ '</td><td> <%=serverStatus.RPERCENT[i]%>%' // Percengate of correct answers
 		//	+ '</td><td style="display: none;">' + data
 			+ '</td></tr>'
 	); 
 
-}
+<% } %>
 
-$('#winRating').html(serverStatus.WINRATING.join(', '));
-$('#winScore').html(serverStatus.WINSCORE.join(', '));
-$('#hightScore').html(serverStatus.HIGHSCORE);
-$('#highRating').html(serverStatus.HIGHRATING);
-$('#numQuestions').html(serverStatus.NUMQ);
+$('#winRating').html('<%= serverStatus.WINRATING.join(', ') %>');
+$('#winScore').html('<%= serverStatus.WINSCORE.join(', ') %>');
+$('#hightScore').html('<%= serverStatus.HIGHSCORE %>');
+$('#highRating').html('<%= serverStatus.HIGHRATING %>');
+$('#numQuestions').html('<%= serverStatus.NUMQ %>');
 
 //Tentar fazer com o $.each
 
 $('.question_detail').each(
 	function(key, val){
 		console.log(key);
-		requestUri = serverQuestionsUri + key +'_result.html';	
+		requestUri = '<%= question_uri %>' + key +'_result.html';	
 		var ctnt = $.get(requestUri).complete(function(){
 
 			$(val).popover({
@@ -32,6 +32,7 @@ $('.question_detail').each(
 			, trigger: 'hover'
 			, content: ctnt.responseText				
 			, title: 'Question ' + (key + 1)
+			, html: true
 
 		})
 

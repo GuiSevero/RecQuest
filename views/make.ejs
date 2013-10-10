@@ -62,7 +62,28 @@
 </form>
 <script>
 (function(){
-	console.log("EDITORS: " + tinymce.editors.length);
+
+	var isMobile = {
+	    Android: function() {
+	        return navigator.userAgent.match(/Android/i);
+	    },
+	    BlackBerry: function() {
+	        return navigator.userAgent.match(/BlackBerry/i);
+	    },
+	    iOS: function() {
+	        return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+	    },
+	    Opera: function() {
+	        return navigator.userAgent.match(/Opera Mini/i);
+	    },
+	    Windows: function() {
+	        return navigator.userAgent.match(/IEMobile/i);
+	    },
+	    any: function() {
+	        return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
+	    }
+	};
+
 	for(var i=0, n=tinymce.editors.length; i<n; i++) {
 	    tinymce.editors[i].destroy();
 	    delete document.getElementById(tinymce.editors[i].id);
@@ -70,7 +91,6 @@
 	
 	var canSent = false;
 
-	console.log('Loaded make page\n Binded buttons');
 	$('#btnSend').click(sendQuestion);
 	$('#btnGoogle').click(googleSearch);
 	$('#searchcontrol').hide();
@@ -80,7 +100,9 @@
             	setTimeout(googleSearch,3000); 	
         	};
 
+
 	//Load the tinyMCE text editor
+if(!isMobile.any())	
 	tinyMCE.init({
         mode : "exact",
         elements : "qtnBody",
@@ -130,15 +152,16 @@
 
      function sendQuestion(){
 
-     	if(tinyMCE.get('qtnBody').getContent() != ''
+     	var content = isMobile.any() ? $('#qtnBody').val() : tinyMCE.get('qtnBody').getContent();
+
+
+     	if( content != ''
      		&& ($('#qtnAnsText1').val() != '')
      		&& ($('#qtnAnsText2').val() != '')
      		&& ($('#qtnAnsText3').val() != '')
      		&& ($('#qtnAnsText4').val() != '')){
      		canSent = true;
      	}
-     	console.log("Content");
-     	console.log(tinyMCE.get('qtnBody').getContent());
 
      	if(!canSent){
      		alert('Preencha todos os campos')
@@ -148,7 +171,7 @@
 		var msg = {
 		"TYPE": "QUESTION",
 		"NAME": user.name,
-		"Q": 	tinyMCE.get('qtnBody').getContent(),
+		"Q": 	content,
 		"O1":  $('#qtnAnsText1').val(),
 		"O2":  $('#qtnAnsText2').val(),
 		"O3":  $('#qtnAnsText3').val(),

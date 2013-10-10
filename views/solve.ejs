@@ -35,20 +35,28 @@
 
 
 		var currentQuestion = 0;
-		var solveAnswers;
-		var solveRatings;
-		var question_uri = <% question_uri %>;
-		var server = <% sv %>;
+		var solveAnswers = Array();
+		var solveRatings = Array();
+		var question_uri = '<%= question_uri %>';
+		var num_questions = '<%= numq %>';
+		var userName = '<%= username %>';
+	
 		
-		console.log(question_uri);
-		
+		var msg = {
+			"TYPE": "ANSWER",
+			"NAME": '<%= username %>',
+			"MYANSWER": Array(),
+			"MYRATING": Array(),
+			"IP": '<%= user_ip %>'
+		};
+
 
 		//load first question
-		$("#solveQuestionBody").load( '/' + 'JunctionServerExecution/current/' + currentQuestion + '.html');
+		$("#solveQuestionBody").load(question_uri + currentQuestion + '.html');
 
-		for(i=0; i < serverStatus.NUMQ; i++){
-			solveAnswers[i] = 1;
-			solveRatings[i] = 3;
+		for(i=0; i < num_questions; i++){
+			msg.MYANSWER[i] = 1;
+			msg.MYRATING[i] = 3;
 		}
 
 
@@ -60,34 +68,28 @@
 		$("#solveCorrectAns").change(setCorrectAnswer);
 		$("#solveRating").change(setRating);
 
-
-
-		console.log("\n Number of questions: " + serverStatus.NUMQ);
-
-		
 		//Init first question
-		$("#solveQuestionBody").load(serverIp + serverQuestionsUri + '/' + currentQuestion + '.html');
 
 		function solveNextQuestion(){
 
 			console.log("\nTrying to load question " + currentQuestion);
 
-			if(currentQuestion < serverStatus.NUMQ -1){
+			if(currentQuestion < num_questions -1){
 
 				currentQuestion++;				
-				$("#solveQuestionBody").load(serverIp + serverQuestionsUri + '/' + currentQuestion + '.html');
+				$("#solveQuestionBody").load(question_uri + currentQuestion + '.html');
 
 
 				console.log('\n solveCorrectAns: ' + $("#solveCorrectAns").val());
 
 				sAns = $("#solveCorrectAns").children();
-				$(sAns[ solveAnswers[currentQuestion] -1]).attr('selected', true);
+				$(sAns[ msg.MYANSWER[currentQuestion] -1]).attr('selected', true);
 
-					console.log('\nsAns ' + $(sAns[ solveAnswers[currentQuestion] -1]).val());
+					console.log('\nsAns ' + $(sAns[ msg.MYANSWER[currentQuestion] -1]).val());
 
 
 					sRats = $("#solveRating").children();
-					$(sRats[ solveRatings[currentQuestion] -1]).attr('selected', true);
+					$(sRats[ msg.MYRATING[currentQuestion] -1]).attr('selected', true);
 
 				
 			}
@@ -102,16 +104,16 @@
 
 			if(currentQuestion > 0){
 				currentQuestion--;				
-				$("#solveQuestionBody").load(serverIp + serverQuestionsUri + '/' + currentQuestion + '.html');
+				$("#solveQuestionBody").load(question_uri + currentQuestion + '.html');
 				console.log("\nLoading question " + currentQuestion);
 
 					sAns = $("#solveCorrectAns").children();
-					$(sAns[ solveAnswers[currentQuestion] -1]).attr('selected', true);
+					$(sAns[ msg.MYANSWER[currentQuestion] -1]).attr('selected', true);
 					
 
 
 					sRats = $("#solveRating").children();
-					$(sRats[ solveRatings[currentQuestion]  -1]).attr('selected', true);
+					$(sRats[ msg.MYRATING[currentQuestion]  -1]).attr('selected', true);
 
 
 			}
@@ -122,15 +124,7 @@
 
 		function sendAnswers(){
 
-			var msg = {
-			"TYPE": "ANSWER",
-			"NAME": userName,
-			"MYANSWER": solveAnswers,
-			"MYRATING": solveRatings,
-			"IP": myIp
-			};
-
-			$.post(serverIp  + userMsg,{MSG: JSON.stringify(msg)})
+			$.post('/JunctionServerExecution/pushmsg.php',{MSG: JSON.stringify(msg)})
 			.success(function(){
 				alert('Questions sent');
 			})
@@ -140,7 +134,7 @@
 
 			//alert(JSON.stringify(msg));
 
-			$('#main-menu').load('views/wait.php');
+			$('#main-menu').load('/wait');
 
 		}
 
@@ -152,5 +146,6 @@
 		function setRating(){
 			solveRatings[currentQuestion] = $("#solveRating").val();
 		}
+
 
 </script>

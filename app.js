@@ -95,17 +95,40 @@
     res.render('make',  { server: req.headers.host , port: app.get('port'), ip: req.connection.remoteAddress });
   });
 
-   app.get('/solve', function(req, res){
-    server.ip = req.headers.host;
+  app.get('/solve', function(req, res){
+
+    fs.readFile(server.server_msg,'utf-8', function (err, data) {
+
+      if(err){
+        res.send(500);
+        return;
+      }
+      sv = JSON.parse(data);
+      
+      var server_ip = req.headers.host;
+      var user_ip = req.connection.remoteAddress;
+
       res.render('solve',  {
-         question_uri: server.ip + server.question_uri
-         ,sv: server
+         question_uri: 'http://' + server_ip + server.question_uri
+         , numq: sv.NUMQ
+         , username: users[user_ip].name
+         , user_ip: user_ip
       });
+
+
+    });
+
   });
 
     app.get('/results', function(req, res){
-    res.render('results',  { server: req.headers.host , port: app.get('port'), ip: req.connection.remoteAddress });
-  });
+
+        fs.readFile(server.server_msg,'utf-8', function (err, data) {
+          if(err) { res.send(500); return; }
+          var sv = JSON.parse(data);
+          res.render('results',  { server: req.headers.host , port: app.get('port'), ip: req.connection.remoteAddress, serverStatus: sv,  question_uri: 'http://' +  req.headers.host + server.question_uri });
+        });
+        
+    });
 
     app.get('/basetext', function(req, res){
       fs.readFile(server.server_base_text, 'utf-8', function(err, data){
@@ -209,77 +232,36 @@
 
     var teacherMsg;
     var userIp = socket.handshake.address.address;
-    var user = users[userIp];
-
-    if (user) console.log(user.name  + server.isOnline);
-
-    //VERIFICA SE O USUARIO JA ESTAVA LOGADO
-    if(user){
-      console.log("Restoring via user hash table");
-      //Atualiza socket do usuario
-      user.socket = socket;
-      socket.user = user;
-
-      //Atualiza estado do usuario
-      if(server.isOnline){
-        socket.emit("restore_state",
-          { 
-                  name: user.name
-                , ip: user.ip
-                , teacherMsg: teacherMsg 
-                , loged: true
-          });
-        }
-      else
-        socket.emit('displayError', "SERVER OFFLINE");
-
-    }else{
-      console.log("Restoring via ip text msg");
-      fs.readFile(server.server_path + userIp + '.txt','utf-8', function (err, data) {
-
-        if(err) { console.log('NEW USER AT ' + userIp); return; }
-
-        var usrMsg = JSON.parse(data);
-        if(server.isOnline){
-
-            socket.user = {
-            name: usrMsg.NAME
-          , socket: socket
-          , ip: userIp
-          , teacherMsg: teacherMsg
-
-          };
-
-        users[userIp] = socket.user;
-
-        socket.emit("restore_state",
-          { 
-                  name: usrMsg.NAME
-                , ip: userIp
-                , teacherMsg: teacherMsg 
-                , loged: true
-          });
-        }
-      else
-        socket.emit('displayError', "SERVER OFFLINE");
-
-
-      });
-      
-    }
-
-
+    
     fs.readFile(server.server_msg,'utf-8', function (err, data) {
       if (err){ 
         socket.emit('server_changed', "SERVER OFFLINE");
-        server.isOnline = false; 
+        socket.emit('displayError', "SERVER OFFLINE");
+        server.isOnline = false;
+        return; 
         }
-        else{
-            socket.emit('server_changed', "SERVER ONLINE");
-            teacherMsg = JSON.parse(data);
-            server.isOnline = true; 
-            //socket.emit(status.TYPE, status);
-        }
+
+      socket.emit('server_changed', "SERVER ONLINE");
+      teacherMsg = JSON.parse(data);
+      server.isOnline = true; 
+
+      fs.readFile(server.server_path + userIp + '.txt','utf-8', function (err, data) {
+
+          if(err) { console.log('NEW USER AT ' + userIp); return; }
+
+          var usrMsg = JSON.parse(data);
+          console.log(usrMsg.NAME + " has been reconected");
+              socket.user = {
+              name: usrMsg.NAME
+            , ip: userIp
+            , teacherMsg: teacherMsg
+
+            };
+
+            users[userIp] = socket.user;
+
+          socket.emit("restore_state", {name: usrMsg.NAME, ip: userIp, teacherMsg: teacherMsg, loged: true});
+      });
        
     });
 
@@ -311,8 +293,7 @@ socket.on('login', function(data, fnAck){
 
         };
 
-        users[userIp] = socket.user;
-        
+
 
         socket.emit(teacherMsg.TYPE, {
             name: socket.user.name
@@ -322,8 +303,10 @@ socket.on('login', function(data, fnAck){
         });
         
         console.log(data.MSG.NAME + " LOGED ON IP " + data.MSG.IP );
+        users[userIp] = socket.user;
         
         fnAck(data.MSG);
+        socket.emit(teacherMsg.TYPE, teacherMsg);
 
 
       });  

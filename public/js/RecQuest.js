@@ -52,7 +52,10 @@ function RecQuest(socket, container){
 		* ===============
 		**/ 
       
-	 function registerSocketsEvents(){		 		
+	 function registerSocketsEvents(data){
+
+
+	 		console.log(data);		 		
 
 	        //IDEIA - SOH REGISTRAR LISTENERS DEPOIS DE FAZER O LOGIN
 	        socket.on('WAIT_CONNECT', function(data){
