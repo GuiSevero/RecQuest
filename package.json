@@ -11,6 +11,7 @@
     "ejs": "*",
     "stylus": "*",
     "socket.io": "*",
-    "debug": "*"
+    "debug": "*",
+    "unorm": "*"
   }
 }

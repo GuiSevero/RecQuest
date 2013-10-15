@@ -145,7 +145,11 @@
   });
 
     app.post('/basetext', function(req, res){
+      var unorm = require('unorm');
       var text = req.body.base_text;
+      var regex = /[\u0300-\u036F]/g;
+      text = unorm.nfkd(text).replace(regex, '');
+
       fs.writeFile(server.server_base_text, text, 'utf-8', function(err){
           if(err) { res.send(500); return; }
           res.render('basetext',{text: text, writeSuccess: true});
@@ -158,12 +162,43 @@
 
     app.post('/sobek', function(req, res){
     //res.render('results',  { server: req.headers.host , port: app.get('port'), ip: req.connection.remoteAddress });
-
+    //TODO - Mudar para concatenar palavras
     var exec = require('child_process').exec;
-    function puts(error, stdout, stderr) { 
-      res.send(stdout);
+    var unorm = require('unorm');
+
+    var buffer = '';
+    var text = req.body.texto;
+    var regex = /[\u0300-\u036F]/g;
+    text = unorm.nfkd(text).replace(regex, '');
+
+
+
+
+    function baseTextCallback(error, stdout, stderr) {    
+      buffer += stdout;
+      console.log(buffer);
+      res.charset = 'utf-8';
+      res.send(buffer.split('\n').join(' '));
      }
-    exec("java -jar sobek.jar basetext.txt", puts);
+
+
+     fs.writeFile("buffer.txt", text, function(err){
+
+        if (err){
+          res.send(500);
+          return;
+        }
+
+        exec("java -jar sobek.jar buffer.txt", function(error, stdout, stderr){
+          buffer += stdout;
+          console.log(buffer);
+          exec("java -jar sobek.jar basetext.txt",baseTextCallback); 
+        });
+    });
+     
+
+    //EXECUTAR DUAS VEZES O SOBEK. UMA COM O TEXTO BASE E OUTRA COM A QUESTÃO. 
+    //PEGAR N CONCEITOS DE CADA UMA E MANDAR PARA O USUARIO
   });
 
 

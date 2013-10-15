@@ -115,7 +115,7 @@ if(!isMobile.any())
 	}); 
 
 	function googleSearch(){	
-			var ed = tinyMCE.get('qtnBody');
+			var ed = tinyMCE.get('qtnBody');			
 			$.post('/sobek', {texto: $(ed.getContent()).text()}, sobekCallBack );
 			ed.onKeyUp.add(keyFunction);
 
