@@ -1,6 +1,6 @@
 <div id="solveQuestion" class="span12 well well-small">
 				<div class="form_description">
-					<h2>Solve Questions</h2>
+					<h2>Solve Question <span id="current-question"></span>/<%= numq %></h2>
 					<p>Select the correct answer and send to teacher.</p>
 				</div>	
 			<div id="solveQuestionBody"></div>
@@ -50,9 +50,26 @@
 			"IP": '<%= user_ip %>'
 		};
 
+		var updateButtons = function(){
+			if(currentQuestion == num_questions-1)
+			$('#btnNextQuestion').attr('disabled', 'disabled');
+			else
+				$('#btnNextQuestion').removeAttr('disabled');
+
+			if(currentQuestion == 0)
+				$('#btnPrevQuestion').attr('disabled', 'disabled');
+			else
+				$('#btnPrevQuestion').removeAttr('disabled');
+
+			$("#current-question").html(currentQuestion + 1);
+		}
+
 
 		//load first question
 		$("#solveQuestionBody").load(question_uri + currentQuestion + '.html');
+
+		updateButtons();
+
 
 		for(i=0; i < num_questions; i++){
 			msg.MYANSWER[i] = 1;
@@ -75,27 +92,18 @@
 			console.log("\nTrying to load question " + currentQuestion);
 
 			if(currentQuestion < num_questions -1){
-
 				currentQuestion++;				
-				$("#solveQuestionBody").load(question_uri + currentQuestion + '.html');
+				$("#solveQuestionBody").load(question_uri + currentQuestion + '.html', function(){
 
-
-				console.log('\n solveCorrectAns: ' + $("#solveCorrectAns").val());
-
-				sAns = $("#solveCorrectAns").children();
-				$(sAns[ msg.MYANSWER[currentQuestion] -1]).attr('selected', true);
-
-					console.log('\nsAns ' + $(sAns[ msg.MYANSWER[currentQuestion] -1]).val());
-
-
+					sAns = $("#solveCorrectAns").children();
+					$(sAns[ msg.MYANSWER[currentQuestion] -1]).attr('selected', true);
 					sRats = $("#solveRating").children();
 					$(sRats[ msg.MYRATING[currentQuestion] -1]).attr('selected', true);
 
+				});
 				
 			}
-
-			
-
+			updateButtons();
 		}
 
 		function solvePrevQuestion(){
@@ -104,21 +112,17 @@
 
 			if(currentQuestion > 0){
 				currentQuestion--;				
-				$("#solveQuestionBody").load(question_uri + currentQuestion + '.html');
-				console.log("\nLoading question " + currentQuestion);
+				$("#solveQuestionBody").load(question_uri + currentQuestion + '.html', function(){
 
 					sAns = $("#solveCorrectAns").children();
 					$(sAns[ msg.MYANSWER[currentQuestion] -1]).attr('selected', true);
-					
-
-
 					sRats = $("#solveRating").children();
 					$(sRats[ msg.MYRATING[currentQuestion]  -1]).attr('selected', true);
-
-
+				});
+				
 			}
 
-			
+			updateButtons();
 		}
 
 
