@@ -17,8 +17,6 @@
 
 
 <body id="main_body" >  
-  <input type="hidden" id="myIp" value="<?php echo $_SERVER['REMOTE_ADDR']; ?>"/><br>
-  <input type="hidden" id="serverIp" size="30" value="<?php echo $_SERVER['SERVER_NAME']; ?>"/><br>
   <div class="container-fluid default-container">
     <div class="row-fluid">
 
@@ -47,10 +45,12 @@
           
         <!-- wraper for content flow -->  
        <form class="form" action="/basetext" method="POST">
-
-			<textarea rows="40" cols="50" class="input-block-level" name="base_text">
+      <label for="passowrd"><b>Base Text</b></label>
+			<textarea rows="20" cols="50" class="input-block-level" name="base_text">
 				<%= text %>
 			</textarea><br>
+      <label for="passowrd"><b>Password</b></label>
+      <input type="password" name="password" class="input-block-level" required /><br>
 			<input type="submit" class="btn btn-primary btn-large" value="Save">
 
 		</form>
@@ -82,6 +82,24 @@
   	);
 	
   </script> 
-  <% } %>
+  <% }else{ %> 
+
+   <script>
+
+    setTimeout(function(){
+      $('#server_msg').html('');
+    }, 3000);
+
+    $('#server_msg').html(
+      [
+        "<span class='alert alert-danger'>"
+      , "ERRO! Senha inválida"
+      , "</span>"
+
+      ].join('')
+
+    );
+  </script>
+  <%} %> 
   </body>
 </html>

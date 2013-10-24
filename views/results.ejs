@@ -1,9 +1,10 @@
 <script>
-
 <% for(i=0; i < serverStatus.NUMQ; i++){ %>
+
 	$('#tblRightAnswers').append(
 			'<tr result="<%=i%>_result.html" class="question_detail"><td> <%= (i+1) %>' //question
-			+ '</td><td> <%= serverStatus.RANSWER[i]%>'  //Answer
+			+ '</td><td><span class="badge <%= userStatus.YOUR_ANSWERS[i] == serverStatus.RANSWER[i] ? "badge-success" : "badge-important" %>"><%= userStatus.YOUR_ANSWERS[i]%></span>' // Your Answer
+			+ '</td><td> <%= serverStatus.RANSWER[i]%>'  //Right Answer
 			+ '</td><td> <%=serverStatus.AVG_RATINGS[i]%>' //Avg Rating
 			+ '</td><td> <%=serverStatus.RPERCENT[i]%>%' // Percengate of correct answers
 		//	+ '</td><td style="display: none;">' + data
@@ -46,7 +47,7 @@ $('.question_detail').each(
 <div id="resultScreen" class="">
 
 <table class="info-table">
-	<th>Question</th><th>Answer</th><th>Average Rating</th><th>Correct Answers</th>
+	<th>Question</th><th>Your Answer</th><th>Correct Answer</th><th>Average Rating</th><th>Correct Answers</th>
 	<tbody id="tblRightAnswers">
 
 	</tbody>

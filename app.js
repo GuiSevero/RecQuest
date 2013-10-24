@@ -97,6 +97,10 @@
     }); 
   });
 
+  app.get('/waitresult', function(req, res){
+    res.render('wait_result',{ server: req.headers.host , port: app.get('port'), ip: req.connection.remoteAddress});
+  });
+
   app.get('/make', function(req, res){
     res.render('make',  { server: req.headers.host , port: app.get('port'), ip: req.connection.remoteAddress });
   });
@@ -128,12 +132,33 @@
 
     app.get('/results', function(req, res){
 
-        fs.readFile(server.server_msg,'utf-8', function (err, data) {
-          if(err) { res.send(500); return; }
-          var sv = JSON.parse(data);
-          res.render('results',  { server: req.headers.host , port: app.get('port'), ip: req.connection.remoteAddress, serverStatus: sv,  question_uri: 'http://' +  req.headers.host + server.question_uri });
+        fs.readFile(server.server_msg,'utf-8', function (err, svdata) {
+          if(err) { res.send(500, "ERROR READING SV STATUS"); return; }
+
+          fs.readFile(server.server_path + req.connection.remoteAddress + '.txt','utf-8', function (err, usrdata) {
+
+            if(err) { res.send(500, "ERROR READING USER STATUS"); return; }
+
+            var sv = JSON.parse(svdata);
+            var usr = JSON.parse(usrdata);
+
+            console.log(usr);
+
+            if(sv.TYPE != "START_SHOW"){
+              res.send(404, "Not done yet, the current status is " + sv.TYPE);
+            }
+
+            res.render('results',  { 
+                server: req.headers.host
+              , port: app.get('port')
+              , ip: req.connection.remoteAddress
+              , serverStatus: sv
+              , userStatus: usr
+              , question_uri: 'http://' +  req.headers.host + server.question_uri
+              , userStatus: usr});
+
+          });
         });
-        
     });
 
     app.get('/basetext', function(req, res){
@@ -147,6 +172,11 @@
     app.post('/basetext', function(req, res){
       var unorm = require('unorm');
       var text = req.body.base_text;
+      var password = req.body.password;
+
+      if (password != "senhaprotegida"){
+        res.render('basetext',{text: text, writeSuccess: false});
+      }
       var regex = /[\u0300-\u036F]/g;
       text = unorm.nfkd(text).replace(regex, '');
 
