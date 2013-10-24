@@ -46,9 +46,7 @@
         <!-- wraper for content flow -->  
        <form class="form" action="/basetext" method="POST">
       <label for="passowrd"><b>Base Text</b></label>
-			<textarea rows="20" cols="50" class="input-block-level" name="base_text">
-				<%= text %>
-			</textarea><br>
+			<textarea rows="20" cols="50" class="input-block-level" name="base_text"><%= text %></textarea><br>
       <label for="passowrd"><b>Password</b></label>
       <input type="password" name="password" class="input-block-level" required /><br>
 			<input type="submit" class="btn btn-primary btn-large" value="Save">
@@ -74,7 +72,7 @@
   	$('#server_msg').html(
   		[
   			"<span class='alert alert-success'>"
-  		,	"Arquivo salvo com sucesso!"
+  		,	"Text has been saved!"
   		,	"</span>"
 
   		].join('')
@@ -93,7 +91,7 @@
     $('#server_msg').html(
       [
         "<span class='alert alert-danger'>"
-      , "ERRO! Senha inválida"
+      , "ERRO! Wrong Password"
       , "</span>"
 
       ].join('')

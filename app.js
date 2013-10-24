@@ -58,8 +58,6 @@
 
     fs.writeFile(server.server_path + fname, content, function (err) {
       if (err) throw res.send(404);
-      console.log('Teacher Sent a File');
-      console.log(req.body.MSG);
       res.send(req.body.MSG);
     });
     
@@ -141,8 +139,6 @@
 
             var sv = JSON.parse(svdata);
             var usr = JSON.parse(usrdata);
-
-            console.log(usr);
 
             if(sv.TYPE != "START_SHOW"){
               res.send(404, "Not done yet, the current status is " + sv.TYPE);
@@ -246,10 +242,7 @@
         }else{
           res.send(data);  
         }
-        
-      });
-
-    console.log(req.params);    
+      });  
 });
 
 
@@ -261,6 +254,8 @@
 
   var sv = http.createServer(app);
   var io = require('socket.io').listen(sv);
+
+
   sv.listen(app.get('port'), function(){
     console.log('SERVER STARTED ON PORT ' + app.get('port'))
   });
