@@ -160,41 +160,44 @@
 
 
 
-    app.post('/sobek', function(req, res){
-    //res.render('results',  { server: req.headers.host , port: app.get('port'), ip: req.connection.remoteAddress });
-    //TODO - Mudar para concatenar palavras
-    var exec = require('child_process').exec;
-    var unorm = require('unorm');
+  app.post('/sobek', function(req, res){
 
-    var buffer = '';
-    var text = req.body.texto;
-    var regex = /[\u0300-\u036F]/g;
-    text = unorm.nfkd(text).replace(regex, '');
+        var client = req.connection.remoteAddress + '.txt';
+        var exec = require('child_process').exec;
+        var unorm = require('unorm');
 
-
-
-
-    function baseTextCallback(error, stdout, stderr) {    
-      buffer += stdout;
-      console.log(buffer);
-      res.charset = 'utf-8';
-      res.send(buffer.split('\n').join(' '));
-     }
+        var buffer = '';
+        var text = req.body.texto;
+        
+        var regex = /[\u0300-\u036F]/g;
+        text = unorm.nfkd(text).replace(regex, '');
 
 
-     fs.writeFile("buffer.txt", text, function(err){
 
-        if (err){
-          res.send(500);
-          return;
+
+        function baseTextCallback(error, stdout, stderr) { 
+            
+           
+          fs.unlink(client, function(err){
+            if (err) { res.send(500, "ERROR ON PARSING BASETEXT"); return;}
+            buffer += stdout;
+            res.charset = 'utf-8';
+            res.send(buffer.split('\n').join(' '));
+          })   
         }
 
-        exec("java -jar sobek.jar buffer.txt", function(error, stdout, stderr){
-          buffer += stdout;
-          console.log(buffer);
-          exec("java -jar sobek.jar basetext.txt",baseTextCallback); 
+
+        fs.writeFile(client, text, function(err){
+
+            if (err){ res.send(500); return;}
+
+            exec("java -jar sobek.jar " + client , function(err, stdout, stderr){
+              if(err) { res.send(500, "ERROR ON PARSING CLIENT TEXT"); return; }
+
+              buffer += stdout;              
+              exec("java -jar sobek.jar basetext.txt",baseTextCallback); 
+            });
         });
-    });
      
 
     //EXECUTAR DUAS VEZES O SOBEK. UMA COM O TEXTO BASE E OUTRA COM A QUESTÃO. 
