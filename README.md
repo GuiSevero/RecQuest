@@ -15,12 +15,12 @@
 - Twitter Bootstrap - http://twitter.github.com/bootstrap/ - Usado para gerar a pagina em HTML5
 
 ### Manual: 
-- Baixe nosso aplicativo e descompacte na pasta de sua escolha. Link: https://github.com/GuiSevero/RecQuest/archive/master.zip
 - Baixe e instale o NodeJS. Link: http://nodejs.org/download/
-- Abra o prompt de comando e instale os componentes do Node com o comando `npm install express socket.io`
-- No prompt de comando, navegue até a pasta onde você extraiu o aplicativo `cd /pasta/para/app/`
-- Execute o aplicativo com o comando `node app.js`. Isto fará com que o servidor web se inicie
-- Vá para a pasta onde você extraiu o aplicativo e abra o arquivo jar JunctionServer_06252011.jar
+- Baixe nosso aplicativo e descompacte na pasta de sua escolha. Link: https://github.com/GuiSevero/RecQuest/archive/master.zip
+- Abra o prompt de comando e navegue ate o diretorio onde descompactou o aplicativo `cd c:\<pasta>`
+- Execute o comando `npm install` para instalar o aplicativo
+- Apos instalado execute o comando `node app.js`. Isto fará com que o servidor web se inicie na porta 80.
+- Vá para a pasta onde você extraiu o aplicativo e abra o arquivo JunctionServer_06252011.jar
 - Para os clientes, abra o aplicativo em um navegador (preferencialmente chrome ou firefox) pelo endereço: `http://<ip do servidor>`
 - Para modificar o ler/texto base vá para `http://<ip do servidor>/basetext`
   
