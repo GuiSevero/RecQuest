@@ -116,12 +116,12 @@ if(!isMobile.any())
 
 	function googleSearch(){	
 			var ed = tinyMCE.get('qtnBody');			
-			$.post('/sobek', {texto: $(ed.getContent()).text()}, sobekCallBack );
+			$.post('/sobek', {texto: $(ed.getContent()).text()}, sobekCb );
 			ed.onKeyUp.add(keyFunction);
 
 		}
 
-        
+        //old callback
         function sobekCallBack(data) {
           // Create a search control
           var searchControl = new google.search.SearchControl();
@@ -147,7 +147,54 @@ if(!isMobile.any())
           		searchControl.execute($('#qtnBody').val());
 
           
-        }        
+        }   
+
+
+       //new callback
+    function sobekCb(text){	
+
+          console.log("SEARCHING DATA: " + text);
+          var params = {
+               cx: '000801171867195628794:8oqdsykmvia',
+               key: 'AIzaSyBEMQ6GHFqElquZKNkNkNVVAPBBX8GpOeo',
+               q: text,
+               //searchType: 'image'
+          }
+
+          $.getJSON('https://www.googleapis.com/customsearch/v1?', params, function(data){
+               $('#searchcontrol').html('');
+               	$('#searchcontrol').show('slow');
+               for(var i in data.items){
+                    
+                     $('#searchcontrol').append(
+               [    
+                    "<div class='panel panel-info'>",
+                    "<div class=\"panel-heading\">",
+                    "<h3 class=\"panel-title\">",
+                    "<a href='" + data.items[i].link + "' target='_blank'",
+                    data.items[i].htmlTitle,
+                    "</a>",
+                    "</h3></div>",
+                    "<div class=\"panel-body\">",
+                    !data.items[i].pagemap ? data.items[i].htmlSnippet : [
+                         "<a href=''><img ", 
+                         " src='" + data.items[i].pagemap.cse_thumbnail[0].src + "' ",
+                         " width='" + data.items[i].pagemap.cse_thumbnail[0].width/2 + "' ",
+                         " height='" + data.items[i].pagemap.cse_thumbnail[0].height/2 + "' ",
+                         " alt='" + data.items[i].htmlTitle + "' ",
+                         " class='img-thumbnail'> </a><br>",
+                         data.items[i].htmlSnippet
+                         ].join(''), 
+                    ,
+                    "</div></div>"            
+               ].join('')
+               );
+
+                    
+               }
+          });
+
+	}     
 
 
      function sendQuestion(){
